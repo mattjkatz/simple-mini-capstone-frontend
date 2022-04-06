@@ -2,14 +2,14 @@
   <div class="home">
     <h1>{{ message }}</h1>
     <div>
-      Name
-      <input type="text" v-model="productName" />
-      Price
-      <input type="text" v-model="productPrice" />
-      Description
-      <input type="text" v-model="productDescription" />
-      Image Url
-      <input type="text" v-model="productImageUrl" />
+      Name:
+      <input type="text" v-model="newProduct.name" />
+      Price:
+      <input type="text" v-model="newProduct.price" />
+      Description:
+      <input type="text" v-model="newProduct.description" />
+      Image Url:
+      <input type="text" v-model="newProduct.image_url" />
     </div>
     <button v-on:click="createProduct()">Create a product</button>
     <div v-for="product in products" v-bind:key="product.id">
@@ -26,6 +26,24 @@
         <p>Name: {{ currentProduct.name }}</p>
         <p>Price: ${{ currentProduct.price }}</p>
         <p>Description: {{ currentProduct.description }}</p>
+        <h1>Edit Product</h1>
+        <p>
+          Edit name:
+          <input v-model="currentProduct.name" type="text" />
+        </p>
+        <p>
+          Edit price:
+          <input v-model="currentProduct.price" type="text" />
+        </p>
+        <p>
+          Edit description:
+          <input v-model="currentProduct.description" type="text" />
+        </p>
+        <p>
+          Edit image URL:
+          <input v-model="currentProduct.image_url" type="text" />
+        </p>
+        <button v-on:click="updateProduct()">Update Info</button>
         <button>Close</button>
       </form>
     </dialog>
@@ -34,6 +52,7 @@
 
 <script>
 import axios from "axios";
+// import { response } from "express";
 
 export default {
   data: function () {
@@ -41,10 +60,7 @@ export default {
       message: "Welcome to Vue.js!",
       products: [],
       errors: [],
-      productName: "",
-      productPrice: "",
-      productDescription: "",
-      productImageUrl: "",
+      newProduct: {},
       currentProduct: {},
     };
   },
@@ -59,14 +75,8 @@ export default {
       });
     },
     createProduct() {
-      var params = {
-        name: this.productName,
-        price: this.productPrice,
-        description: this.productDescription,
-        image_url: this.productImageUrl,
-      };
       axios
-        .post("http://localhost:3000/products", params)
+        .post("http://localhost:3000/products", this.newProduct)
         .then((response) => {
           console.log(response.data);
           this.products.push(response.data);
@@ -80,6 +90,12 @@ export default {
         this.currentProduct = response.data;
         console.log(response.data);
         document.querySelector("#product-details").showModal();
+      });
+    },
+    updateProduct() {
+      axios.patch(`http://localhost:3000/products/${this.currentProduct.id}`, this.currentProduct).then((response) => {
+        // this.currentProduct = response.data;
+        console.log("Woo!", response);
       });
     },
   },
