@@ -44,6 +44,7 @@
           <input v-model="currentProduct.image_url" type="text" />
         </p>
         <button v-on:click="updateProduct()">Update Info</button>
+        <button v-on:click="deleteProduct(currentProduct)">Delete Product</button>
         <button>Close</button>
       </form>
     </dialog>
@@ -85,8 +86,8 @@ export default {
           console.log(error.response);
         });
     },
-    showProduct(recipe) {
-      axios.get(`http://localhost:3000/products/${recipe.id}`).then((response) => {
+    showProduct(product) {
+      axios.get(`http://localhost:3000/products/${product.id}`).then((response) => {
         this.currentProduct = response.data;
         console.log(response.data);
         document.querySelector("#product-details").showModal();
@@ -94,9 +95,16 @@ export default {
     },
     updateProduct() {
       axios.patch(`http://localhost:3000/products/${this.currentProduct.id}`, this.currentProduct).then((response) => {
-        // this.currentProduct = response.data;
         console.log("Woo!", response);
+        // var index = this.products.indexOf(currentProduct);
       });
+    },
+    deleteProduct(product) {
+      // axios.delete(`http://localhost:3000/products/${product.id}`).then((response) => {
+      //   console.log(response);
+      var index = this.products.indexOf(product);
+      this.products.splice(index, 1);
+      // });
     },
   },
 };
