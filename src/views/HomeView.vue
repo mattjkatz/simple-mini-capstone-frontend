@@ -11,13 +11,24 @@
       Image Url
       <input type="text" v-model="productImageUrl" />
     </div>
-    <button v-on:click="productCreate()">Create a product</button>
+    <button v-on:click="createProduct()">Create a product</button>
     <div v-for="product in products" v-bind:key="product.id">
       <h2>{{ product.name }}</h2>
       <p>${{ product.price }} + shipping and handling</p>
       <img v-bind:src="product.image_url" v-bind:alt="product.name" style="max-height: 250px" />
-      <p>{{ product.description }}</p>
+      <div>
+        <button v-on:click="showProduct(product)">More Info</button>
+      </div>
     </div>
+    <dialog id="product-details">
+      <form method="dialog">
+        <h1>Product Info</h1>
+        <p>Name: {{ currentProduct.name }}</p>
+        <p>Price: ${{ currentProduct.price }}</p>
+        <p>Description: {{ currentProduct.description }}</p>
+        <button>Close</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
@@ -34,20 +45,20 @@ export default {
       productPrice: "",
       productDescription: "",
       productImageUrl: "",
+      currentProduct: {},
     };
   },
   created: function () {
-    this.productIndex();
-    // this.productUpdate();
+    this.indexProduct();
   },
   methods: {
-    productIndex() {
+    indexProduct() {
       axios.get("http://localhost:3000/products").then((response) => {
         console.log(response.data);
         this.products = response.data;
       });
     },
-    productCreate() {
+    createProduct() {
       var params = {
         name: this.productName,
         price: this.productPrice,
@@ -64,13 +75,13 @@ export default {
           console.log(error.response);
         });
     },
-    // productUpdate() {
-    //   let params = { image_url: "https://i.ebayimg.com/images/g/qgQAAOSw7elfmNzn/s-l300.jpg" };
-    //   axios.patch(`http://localhost:3000/products${this.id}`, params).then((response) => {
-    //     console.log(response.data);
-    //     this.products = response.data;
-    //   });
-    // },
+    showProduct(recipe) {
+      axios.get(`http://localhost:3000/products/${recipe.id}`).then((response) => {
+        this.currentProduct = response.data;
+        console.log(response.data);
+        document.querySelector("#product-details").showModal();
+      });
+    },
   },
 };
 </script>
